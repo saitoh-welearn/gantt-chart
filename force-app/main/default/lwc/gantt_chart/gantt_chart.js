@@ -9,6 +9,7 @@ import getChartData from "@salesforce/apex/ganttChart.getChartData";
 import getProjects from "@salesforce/apex/ganttChart.getProjects";
 import getResources from "@salesforce/apex/ganttChart.getResources";
 
+//test
 export default class GanttChart extends LightningElement {
   @api recordId = "";
   @api objectApiName;
