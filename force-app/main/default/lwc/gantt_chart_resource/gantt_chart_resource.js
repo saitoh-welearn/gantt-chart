@@ -1,11 +1,12 @@
 import { LightningElement, api, track } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import {NavigationMixin} from 'lightning/navigation';
 
 import getProjects from "@salesforce/apex/ganttChart.getProjects";
 import saveAllocation from "@salesforce/apex/ganttChart.saveAllocation";
 import deleteAllocation from "@salesforce/apex/ganttChart.deleteAllocation";
 
-export default class GanttChartResource extends LightningElement {
+export default class GanttChartResource extends NavigationMixin(LightningElement) {
   @api isResourceView; // resource page has different layout
   @api projectId; // used on project page for quick adding of allocations
   @api
@@ -21,6 +22,8 @@ export default class GanttChartResource extends LightningElement {
   @api startDate;
   @api endDate;
   @api dateIncrement;
+  // IconType
+  @api iconType;
 
   @api
   refreshDates(startDate, endDate, dateIncrement) {
@@ -50,7 +53,12 @@ export default class GanttChartResource extends LightningElement {
           if (times.length % 7 === 6) {
             time.class += " lwc-is-week-end";
           }
+        
+          if (times.length % 7 === 6 || times.length % 7 === 5) {
+            time.class += " lwc-are-weekends";
+          }
         }
+
 
         if (today >= time.start && today <= time.end) {
           time.class += " lwc-is-today";
@@ -63,6 +71,13 @@ export default class GanttChartResource extends LightningElement {
       this.startDate = startDate;
       this.endDate = endDate;
       this.dateIncrement = dateIncrement;
+      //set IconType
+      switch( this._resource.Default_Role__c.substr(0,2)){
+        case '01':     this.iconType = 'standard:service_crew_member';  break;
+        case '02':     this.iconType = 'custom:custom31';  break;
+        case '03':     this.iconType = 'custom:custom19';  break
+        default:        this.iconType = 'utility:question_mark'; break;
+      }
       this.setProjects();
     }
   }
@@ -237,11 +252,12 @@ export default class GanttChartResource extends LightningElement {
       };
 
       self.resource.allocationsByProject[projectId].forEach(allocation => {
-        allocation.class = self.calcClass(allocation);
-        allocation.style = self.calcStyle(allocation);
-        allocation.labelStyle = self.calcLabelStyle(allocation);
+        let _allocation = Object.assign({}, allocation);
+        _allocation.class = self.calcClass(_allocation);
+        _allocation.style = self.calcStyle(_allocation);
+        _allocation.labelStyle = self.calcLabelStyle(_allocation);
 
-        project.allocations.push(allocation);
+        project.allocations.push(_allocation);
       });
 
       self.projects.push(project);
@@ -275,6 +291,11 @@ export default class GanttChartResource extends LightningElement {
             label: "Unavailable"
           });
 
+          projects.push( {
+            value: "Create",
+            label: "+新規作成"    
+          })
+          
           self.addAllocationData = {
             projects: projects,
             startDate: startUTC + "",
@@ -301,6 +322,16 @@ export default class GanttChartResource extends LightningElement {
     if (!this.addAllocationData.projectId) {
       this.addAllocationData.disabled = true;
     } else {
+      if( event.target.value === 'Create'){
+        
+        this[NavigationMixin.Navigate]({
+          type: 'standard__objectPage',
+          attributes: {
+              objectApiName: 'Project__c',
+              actionName: 'new'
+          }
+        })
+      }
       this.addAllocationData.disabled = false;
     }
   }
@@ -609,3 +640,4 @@ export default class GanttChartResource extends LightningElement {
       });
   }
 }
+
