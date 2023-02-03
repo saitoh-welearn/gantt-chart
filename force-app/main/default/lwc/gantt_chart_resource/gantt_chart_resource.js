@@ -53,7 +53,7 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
           if (times.length % 7 === 6) {
             time.class += " lwc-is-week-end";
           }
-        }
+          }
 
         if (today >= time.start && today <= time.end) {
           time.class += " lwc-is-today";
@@ -67,11 +67,10 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
       this.endDate = endDate;
       this.dateIncrement = dateIncrement;
       //set IconType
-      switch( this._resource.Default_Role__c){
-        case 'エンジニア':  this.iconType = 'standard:user';  break;
-        case '車':     this.iconType = 'standard:work_order';  break;
-        case 'ケーブル':     this.iconType = 'standard:apex_plugin';  break;
-        case 'ツール':     this.iconType = 'standard:custom';  break;
+      switch( this._resource.Default_Role__c.substr(0,2)){
+        case '01':     this.iconType = 'standard:service_crew_member';  break;
+        case '02':     this.iconType = 'custom:custom31';  break;
+        case '03':     this.iconType = 'custom:custom19';  break
         default:        this.iconType = 'utility:question_mark'; break;
       }
       this.setProjects();
