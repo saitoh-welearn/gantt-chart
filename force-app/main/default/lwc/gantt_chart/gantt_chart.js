@@ -194,7 +194,7 @@ export default class GanttChart extends LightningElement {
       } else {
         day.end = date.toDate();
         day.dayName = date.format("ddd");
-        if (date.day() === 0) {
+        if (date.day() === 0|| date.day() === 6) {
           day.class = day.class + " lwc-is-week-end";
         }
       }
