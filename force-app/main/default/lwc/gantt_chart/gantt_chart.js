@@ -55,6 +55,8 @@ export default class GanttChart extends LightningElement {
   @track filterModalData = {
     disabled: true,
     message: "",
+    colors: [],
+    colorOptions: [],
     projects: [],
     projectRecordTypes: [], // Record Type Id for each option
     roles: [],
@@ -79,6 +81,7 @@ export default class GanttChart extends LightningElement {
     ]
   };
   _filterData = {
+    colors: [],
     projects: [],
     projectIds: [],
     projectRecordType: [], // to track record type Ids 
@@ -348,6 +351,10 @@ export default class GanttChart extends LightningElement {
   }
 
   openFilterModal() {
+    this.filterModalData.colors = Object.assign(
+      [], 
+    this._filterData.colors
+    );
     this.filterModalData.projects = Object.assign(
       [],
       this._filterData.projects
@@ -355,6 +362,39 @@ export default class GanttChart extends LightningElement {
     this.filterModalData.roles = Object.assign([], this._filterData.roles);
     this.filterModalData.status = this._filterData.status;
     this.template.querySelector(".filter-modal").show();
+  }
+
+  filterColors(event){
+    this.hideDropdowns();
+    let text = event.target.value;
+    // only show roles not selected
+    this.filterModalData.colorOptions = this.colors
+      .filter(color => {
+        return (
+          color.toLowerCase().includes(text.toLowerCase()) &&
+          !this.filterModalData.colors.filter(c => {
+            return c === color;
+          }).length
+        );
+      })
+      .map(color => {
+        return color;
+      });
+     
+    this.filterModalData.focus = "colors";
+    console.log("colors"+JSON.stringify(this.colors) );
+  
+  }
+
+  addColorFilter(event){
+    this.filterModalData.colors.push(event.currentTarget.dataset.color);
+    this.filterModalData.focus = null;
+    this.setFilterModalDataDisable();
+  }
+  
+  removeColorFilter(event){
+    this.filterModalData.colors.splice(event.currentTarget.dataset.index, 1);
+    this.setFilterModalDataDisable();
   }
 
   filterProjects(event) {
@@ -458,6 +498,7 @@ export default class GanttChart extends LightningElement {
   }
 
   clearFilters() {
+    this.filterModalData.colors = [];
     this.filterModalData.projects = [];
     this.filterModalData.roles = [];
     this.filterModalData.status = "";
@@ -468,6 +509,7 @@ export default class GanttChart extends LightningElement {
     this.filterModalData.disabled = true;
 
     if (
+      this.filterModalData.colors.length > 0 ||
       this.filterModalData.projects.length > 0 ||
       this.filterModalData.roles.length > 0 ||
       this.filterModalData.status !== ""
@@ -481,12 +523,14 @@ export default class GanttChart extends LightningElement {
     if (this.filterModalData.focus) {
       return;
     }
+    this.filterModalData.colorOptions = [];
     this.filterModalData.projectOptions = [];
     this.filterModalData.roleOptions = [];
   }
 
   applyFilters() {
     this._filterData = {
+      colors: Object.assign([], this.filterModalData.colors),
       projects: Object.assign([], this.filterModalData.projects),
       roles: Object.assign([], this.filterModalData.roles),
       status: this.filterModalData.status
@@ -501,6 +545,11 @@ export default class GanttChart extends LightningElement {
     });
 */
     let filters = [];
+
+    if (this.filterModalData.colors.length) {
+      filters.push("Colors");
+    }
+
     if (this.filterModalData.projects.length) {
       filters.push("Projects");
     }
@@ -592,6 +641,7 @@ export default class GanttChart extends LightningElement {
         startTime: self.startDateUTC,
         endTime: self.endDateUTC,
         slotSize: self.view.slotSize,
+        filterColors: self._filterData.colors,
         filterProjects: self._filterData.projectIds,
         filterProjectRecords: self._filterData.projectRecordTypes, // filter for record types
         filterRoles: self._filterData.roles,
@@ -601,6 +651,7 @@ export default class GanttChart extends LightningElement {
         self.isProjectView = typeof self.objectApiName !== 'undefined' && self.objectApiName.endsWith('Project__c');
         self.isRecordTypeView = typeof self.objectApiName !== 'undefined' && self.objectApiName.endsWith('Project__c');
         self.projectId = data.projectId;
+        self.colors =data.colors;
         self.projects = data.projects;
         self.roles = data.roles;
 

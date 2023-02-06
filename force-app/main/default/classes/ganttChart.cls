@@ -1,6 +1,6 @@
 public with sharing class ganttChart {
     @AuraEnabled
-    public static Map<String, Object> getChartData(String recordId, String startTime, String endTime, Integer slotSize, List<String> filterProjects, List<String> filterRoles, String filterStatus) {
+    public static Map<String, Object> getChartData(String recordId, String startTime, String endTime, Integer slotSize, List<String> filterColors, List<String> filterProjects, List<String> filterRoles, String filterStatus) {
         Map<String, Object> data = new Map<String, Object>();
         String query = 'SELECT Resource__c, Resource__r.Name, Resource__r.Active__c, Resource__r.Default_Role__c, Resource__r.Status__c, Project__c, Project__r.Name, Project__r.Active__c, Project__r.Color__c, Start_Date__c, End_Date__c, Status__c, Effort__c FROM Allocation__c WHERE Start_Date__c <= :endDate AND End_Date__c >= :startDate AND (Project__c = NULL OR Project__r.Active__c = TRUE) AND Resource__r.Active__c = TRUE';
         
@@ -8,7 +8,12 @@ public with sharing class ganttChart {
         Map<String, Object> projectById = new Map<String, Object>();
         Map<String, Object> resourceById = new Map<String, Object>();
         Set<String> roles = new Set<String>();
+        Set<String> colors = new Set<String>();
 
+
+        if (!filterColors.isEmpty()) {
+            query += ' AND Project__r.Color__c IN :filterColors';
+        }
         if (!filterProjects.isEmpty()) {
             query += ' AND Project__c IN :filterProjects';
         }
@@ -122,12 +127,14 @@ public with sharing class ganttChart {
                     'right' => right
                 });
 
+                colors.add(allocation.Project__r.Color__c);
                 roles.add(allocation.Resource__r.Default_Role__c);
             }
         }
 
         data.put('projects', projectById.values());
         data.put('resources', resourceById.values());
+        data.put('colors', colors);
         data.put('roles', roles);
         
         return data;
