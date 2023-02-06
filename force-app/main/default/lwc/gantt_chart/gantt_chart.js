@@ -523,7 +523,7 @@ export default class GanttChart extends LightningElement {
       this._filterData.message = "Filtered By " + filters.join(", ");
     }
 
-    this.handleRefreshWithApply();
+    this.handleRefresh(true);
     this.template.querySelector(".filter-modal").hide();
   }
   /*** /Filter Modal ***/
@@ -583,7 +583,7 @@ export default class GanttChart extends LightningElement {
   //   }
   // }
 
-  handleRefresh() {
+  handleRefresh(applyFilter=false) {
     // refreshApex(this.wiredData);
     let self = this;
 
@@ -626,65 +626,10 @@ export default class GanttChart extends LightningElement {
             self.resources.push(newResource);
         });
 
-        debugger;
-    }).catch(error => {
-        this.dispatchEvent(new ShowToastEvent({
-            message: error.body.message,
-            variant: 'error'
-        }));
-    });
-  }
-
-  handleRefreshWithApply() {
-    // refreshApex(this.wiredData);
-    let self = this;
-
-    getChartData({
-        recordId: self.recordId ? self.recordId : '',
-        startTime: self.startDateUTC,
-        endTime: self.endDateUTC,
-        slotSize: self.view.slotSize,
-        filterProjects: self._filterData.projectIds,
-        filterProjectRecords: self._filterData.projectRecordTypes, // filter for record types
-        filterRoles: self._filterData.roles,
-        filterStatus: self._filterData.status
-    }).then(data => {
-        self.isResourceView = typeof self.objectApiName !== 'undefined' && self.objectApiName.endsWith('Resource__c');
-        self.isProjectView = typeof self.objectApiName !== 'undefined' && self.objectApiName.endsWith('Project__c');
-        self.isRecordTypeView = typeof self.objectApiName !== 'undefined' && self.objectApiName.endsWith('Project__c');
-        self.projectId = data.projectId;
-        self.projects = data.projects;
-        self.roles = data.roles;
-
-        // empty old data
-        // we want to keep resources we've already seen
-        self.resources.forEach(function (resource, i) {
-            self.resources[i] = {
-                Id: resource.Id,
-                Name: resource.Name,
-                Default_Role__c: resource.Default_Role__c,
-                allocationsByProject: {}
-            };
-        });
-
-        data.resources.forEach(function (newResource) {
-            for (let i = 0; i < self.resources.length; i++) {
-                if (self.resources[i].Id === newResource.Id) {
-                    self.resources[i] = newResource;
-                    return;
-                }
-            }
-
-            self.resources.push(newResource);
-        });
-        
-        for(let i=0; i < self.resources.length; i++ ){
-            if(JSON.stringify(self.resources[i].allocationsByProject) == '{}'){
-                self.resources.splice(i, 1);
-                i--;
-            }
+        if (applyFilter && (self._filterData.projectIds != "" || self._filterData.roles != ""  || self._filterData.status != "")) {
+          self.resources = self.resources.filter(resource => JSON.stringify(resource.allocationsByProject) !== '{}');
         }
-
+        
         debugger;
     }).catch(error => {
         this.dispatchEvent(new ShowToastEvent({
