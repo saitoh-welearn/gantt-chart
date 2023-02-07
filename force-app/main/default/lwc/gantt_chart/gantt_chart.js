@@ -677,7 +677,7 @@ export default class GanttChart extends LightningElement {
             self.resources.push(newResource);
         });
 
-        if (applyFilter && (self._filterData.projectIds != "" || self._filterData.roles != ""  || self._filterData.status != "")) {
+        if (applyFilter && (self._filterData.colors != "" || self._filterData.projectIds != "" || self._filterData.roles != ""  || self._filterData.status != "")) {
           self.resources = self.resources.filter(resource => JSON.stringify(resource.allocationsByProject) !== '{}');
         }
         
