@@ -572,7 +572,7 @@ export default class GanttChart extends LightningElement {
       this._filterData.message = "Filtered By " + filters.join(", ");
     }
 
-    this.handleRefresh();
+    this.handleRefresh(true);
     this.template.querySelector(".filter-modal").hide();
   }
   /*** /Filter Modal ***/
@@ -632,7 +632,7 @@ export default class GanttChart extends LightningElement {
   //   }
   // }
 
-  handleRefresh() {
+  handleRefresh(applyFilter=false) {
     // refreshApex(this.wiredData);
     let self = this;
 
@@ -677,6 +677,10 @@ export default class GanttChart extends LightningElement {
             self.resources.push(newResource);
         });
 
+        if (applyFilter && (self._filterData.projectIds != "" || self._filterData.roles != ""  || self._filterData.status != "")) {
+          self.resources = self.resources.filter(resource => JSON.stringify(resource.allocationsByProject) !== '{}');
+        }
+        
         debugger;
     }).catch(error => {
         this.dispatchEvent(new ShowToastEvent({
