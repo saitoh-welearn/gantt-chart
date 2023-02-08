@@ -30,6 +30,7 @@ public with sharing class tst_ganttChart {
             1,
             new List<String>(),
             new List<String>(),
+            new List<String>(),
             '');
         Test.stopTest();
 
@@ -81,6 +82,7 @@ public with sharing class tst_ganttChart {
             String.valueOf(dt.getTime()),
             String.valueOf(dt.getTime()),
             1,
+            new List<String> { p.color__c },
             new List<String> { p.Id },
             new List<String> { r.Default_Role__c },
             a.Status__c);
