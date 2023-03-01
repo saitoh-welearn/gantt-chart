@@ -262,8 +262,8 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
   handleTimeslotClick(event) {
     const start = new Date(parseInt(event.currentTarget.dataset.start, 10));
     const end = new Date(parseInt(event.currentTarget.dataset.end, 10));
-    const startUTC = start.getTime() + start.getTimezoneOffset() * 60 * 1000;
-    const endUTC = end.getTime() + end.getTimezoneOffset() * 60 * 1000;
+    const startUTC = start.getTime() - start.getTimezoneOffset() * 60 * 1000;
+    const endUTC = end.getTime() - end.getTimezoneOffset() * 60 * 1000;
 
     if (this.projectId) {
       this._saveAllocation({
@@ -430,13 +430,14 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
     this.projects[projectIndex].allocations[allocationIndex] = allocation;
 
     let startDate = new Date(allocation.Start_Date__c + "T00:00:00");
-    let endDate = new Date(allocation.End_Date__c + "T00:00:00");
-
+    let endDate = new Date(allocation.End_Date__c + "T00:00:00");  
+    
+    // JTY → JTY + 9:00 for Apex
     this._saveAllocation({
       allocationId: allocation.Id,
       startDate:
-        startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000 + "",
-      endDate: endDate.getTime() + endDate.getTimezoneOffset() * 60 * 1000 + ""
+        startDate.getTime() - startDate.getTimezoneOffset() * 60 * 1000 + "",
+      endDate: endDate.getTime() - endDate.getTimezoneOffset() * 60 * 1000 + ""
     });
 
     this.dragInfo = {};
@@ -453,6 +454,10 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
     const end = new Date(parseInt(event.currentTarget.dataset.end, 10));
     const index = parseInt(event.currentTarget.dataset.index, 10);
 
+    // JTY → JTY + 9:00
+    const startUTC = new Date(start.getTime() - start.getTimezoneOffset() * 60 * 1000); 
+    const endUTC = new Date(end.getTime() - end.getTimezoneOffset() * 60 * 1000);
+    
     if (isNaN(this.dragInfo.startIndex)) {
       this.dragInfo.startIndex = index;
     }
@@ -464,7 +469,8 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
     switch (direction) {
       case "left":
         if (index <= allocation.right) {
-          allocation.Start_Date__c = start.toJSON().substr(0, 10);
+          // JTY + 9:00 → JTY
+          allocation.Start_Date__c = startUTC.toJSON().substr(0, 10);
           allocation.left = index;
         } else {
           allocation = this.dragInfo.newAllocation;
@@ -472,7 +478,8 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
         break;
       case "right":
         if (index >= allocation.left) {
-          allocation.End_Date__c = end.toJSON().substr(0, 10);
+          // JTY + 9:00 → JTY
+          allocation.End_Date__c = endUTC.toJSON().substr(0, 10);
           allocation.right = index;
         } else {
           allocation = this.dragInfo.newAllocation;
@@ -494,8 +501,13 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
           endDate.getDate() + allocation.right * this.dateIncrement
         );
 
-        allocation.Start_Date__c = startDate.toJSON().substr(0, 10);
-        allocation.End_Date__c = endDate.toJSON().substr(0, 10);
+        // JTY → JTY + 9:00
+        const startDateUTC = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60 * 1000); 
+        const endDateUTC = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60 * 1000);
+
+        // JTY + 9:00 → JTY
+        allocation.Start_Date__c = startDateUTC.toJSON().substr(0, 10);
+        allocation.End_Date__c = endDateUTC.toJSON().substr(0, 10);
     }
 
     this.dragInfo.newAllocation = allocation;
@@ -583,10 +595,11 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
     this._saveAllocation({
       allocationId: this.editAllocationData.id,
       projectId: this.editAllocationData.projectId,
+      // JTY → JTY + 9:00
       startDate:
-        startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000 + "",
+        startDate.getTime() - startDate.getTimezoneOffset() * 60 * 1000 + "",
       endDate:
-        endDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000 + "",
+        endDate.getTime() - startDate.getTimezoneOffset() * 60 * 1000 + "",
       effort: this.editAllocationData.effort,
       status: this.editAllocationData.status
     })

@@ -140,7 +140,7 @@ export default class GanttChart extends LightningElement {
       this.startDateUTC =
         moment(this.startDate)
           .utc()
-          .valueOf() -
+          .valueOf() +
         moment(this.startDate).utcOffset() * 60 * 1000 +
         "";
       this.formattedStartDate = this.startDate.toLocaleDateString();
@@ -163,7 +163,7 @@ export default class GanttChart extends LightningElement {
     this.endDateUTC =
       moment(this.endDate)
         .utc()
-        .valueOf() -
+        .valueOf() +
       moment(this.endDate).utcOffset() * 60 * 1000 +
       "";
     this.formattedEndDate = this.endDate.toLocaleDateString();
