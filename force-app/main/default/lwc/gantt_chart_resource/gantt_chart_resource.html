@@ -7,8 +7,8 @@
                     <lightning-icon icon-name={iconType} size="medium"></lightning-icon>
                 </div>
                 <div class="slds-media__body slds-truncate">
-                    <h3 class="slds-text-body_default">
-                        {resource.Name}
+                    <h3 class="slds-text-body_small slds-text-color_weak">
+                        <a data-record-id={resource.Id} onclick={navigateToRecordpage}>{resource.Name}</a>
                     </h3>
                     <h3 class="slds-text-body_small slds-text-color_weak">
                         {resource.Default_Role__c}
