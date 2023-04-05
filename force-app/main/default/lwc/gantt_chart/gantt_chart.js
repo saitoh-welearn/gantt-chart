@@ -137,12 +137,9 @@ export default class GanttChart extends LightningElement {
       this.startDate = moment(_startDate)
         .day(1)
         .toDate();
-      this.startDateUTC =
-        moment(this.startDate)
-          .utc()
-          .valueOf() -
-        moment(this.startDate).utcOffset() * 60 * 1000 +
-        "";
+      //this.startDateUTC =  moment(this.startDate).utc().valueOf() - moment(this.startDate).utcOffset() * 60 * 1000 +"";
+      //console.log(this.startDateUTC);
+      this.startDateUTC = this.startDate.getTime();
       this.formattedStartDate = this.startDate.toLocaleDateString();
 
       this.setDateHeaders();
@@ -160,12 +157,8 @@ export default class GanttChart extends LightningElement {
     this.endDate = moment(this.startDate)
       .add(this.view.slots * this.view.slotSize - 1, "days")
       .toDate();
-    this.endDateUTC =
-      moment(this.endDate)
-        .utc()
-        .valueOf() -
-      moment(this.endDate).utcOffset() * 60 * 1000 +
-      "";
+//    this.endDateUTC = moment(this.endDate).utc().valueOf() - moment(this.endDate).utcOffset() * 60 * 1000 +"";
+    this.endDateUTC = this.endDate.getTime();
     this.formattedEndDate = this.endDate.toLocaleDateString();
 
     const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
