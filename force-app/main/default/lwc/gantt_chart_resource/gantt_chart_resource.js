@@ -25,6 +25,14 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
   // IconType
   @api iconType;
 
+  @api formatDate(dt) {
+    var y = dt.getFullYear();
+    var m = ('00' + (dt.getMonth()+1)).slice(-2);
+    var d = ('00' + dt.getDate()).slice(-2);
+    return (y + '-' + m + '-' + d);
+  }
+  //休日
+  @api holidays =[];
   @api
   refreshDates(startDate, endDate, dateIncrement) {
     if (startDate && endDate && dateIncrement) {
@@ -39,6 +47,7 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
         date.setDate(date.getDate() + dateIncrement)
       ) {
         let time = {
+          id: ""+ this.formatDate(date),//キムリナ追記
           class: "slds-col lwc-timeslot",
           start: date.getTime()
         };
@@ -58,6 +67,11 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
         if (today >= time.start && today <= time.end) {
           time.class += " lwc-is-today";
         }
+
+        if (this.holidays.includes(time.id)) {
+        time.class += " lwc-is-holiday";
+      }
+      //キムりな追記終了
 
         times.push(time);
       }
@@ -641,22 +655,4 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
         );
       });
   }
-
-  navigateToRecordpage(event) {
-
-    let recid = event.target.dataset.recordId;
-    console.log(event.target.dataset.recordId);
-
-    this[NavigationMixin.GenerateUrl]({
-      type: 'standard__recordPage',
-      attributes: {
-            objectApiName: 'Resource__c',
-            recordId: recid,
-            actionName: 'view',
-      },
-    }).then(url => {
-      window.open(url, "_blank");
-    });
-  }
-
 }

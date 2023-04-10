@@ -106,7 +106,7 @@
                     </div>
                     <div class="slds-grid">
                       <template for:each={date.days} for:item="day">
-                        <div key={day} class={day.class}>
+                        <div key={day} class={day.class} data-id={day.id}>
                           <div if:true={day.dayName}>{day.dayName}</div>
                           <div>{day.label}</div>
                         </div>
@@ -132,6 +132,7 @@
                 date-increment={view.slotSize}
                 start-date={startDate}
                 end-date={endDate}
+                holidays={holidays}
                 onrefresh={handleRefresh}
               ></c-gantt_chart_resource>
             </template>

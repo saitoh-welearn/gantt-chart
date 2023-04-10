@@ -8,6 +8,8 @@ import { loadScript } from "lightning/platformResourceLoader";
 import getChartData from "@salesforce/apex/ganttChart.getChartData";
 import getProjects from "@salesforce/apex/ganttChart.getProjects";
 import getResources from "@salesforce/apex/ganttChart.getResources";
+import getHolidays from "@salesforce/apex/ganttChart.getHolidays";
+
 
 export default class GanttChart extends LightningElement {
   @api recordId = "";
@@ -153,6 +155,21 @@ export default class GanttChart extends LightningElement {
     }
   }
 
+  //休日
+  @track holidays =[];
+  @wire(getHolidays)
+  wiredGetHolidays({ data, error }) {
+      if (data) {
+          //this.holidays = data;
+          this.holidays = data.map(holiday => holiday.HolidayDate__c);
+          console.log("holidays" + JSON.stringify(this.holidays));
+          this.setDateHeaders();
+      } else if (error) {
+          console.error(error);
+      }
+  }
+
+ 
   setDateHeaders() {
     this.endDate = moment(this.startDate)
       .add(this.view.slots * this.view.slotSize - 1, "days")
@@ -179,6 +196,7 @@ export default class GanttChart extends LightningElement {
       }
 
       let day = {
+        id: "" + date.format("YYYY-MM-DD"),  //キムリナ追記
         class: "slds-col slds-p-vertical_x-small slds-m-top_x-small lwc-timeline_day",
         label: date.format("M/D"),
         start: date.toDate()
@@ -199,6 +217,11 @@ export default class GanttChart extends LightningElement {
         day.class += " lwc-is-today";
       }
 
+      //休日のクラス追加
+      if (this.holidays.includes(day.id)) {
+        day.class += " lwc-is-holiday";
+      }
+      //キムリナ追記終了
       dates[index].days.push(day);
       dates[index].style =
         "width: calc(" +
