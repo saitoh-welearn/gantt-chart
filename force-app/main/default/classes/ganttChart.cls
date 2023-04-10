@@ -204,4 +204,17 @@ public with sharing class ganttChart {
     public static void deleteAllocation(Id allocationId) {
         delete new Allocation__c(Id = allocationId);
     }
+
+ 
+ 
+    @AuraEnabled(cacheable=true)
+    public static List<Holiday__c> getHolidays() {
+        List<Holiday__c> holidays =[SELECT Id, Name,HolidayDate__c
+                                     FROM Holiday__c
+                                    ];
+               return holidays;
 }
+
+}
+   
+    
