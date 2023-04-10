@@ -238,4 +238,21 @@ public with sharing class tst_ganttChart {
 
         System.assertEquals(0, allocations.size());
     }
+
+    @isTest
+    static void ganttChart_getHolidays() {
+        Date d = Date.today();
+        Holiday__c h = new Holiday__c(
+            Name='Test H',
+            HolidayDate__c = d);
+        insert h;
+
+        Test.startTest();
+        List<Holiday__c> holidays = ganttChart.getHolidays();
+        Test.stopTest();
+
+        Assert.areEqual( 1, holidays.size());
+
+    }
+
 }

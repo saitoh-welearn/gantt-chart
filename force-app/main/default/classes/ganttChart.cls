@@ -213,7 +213,7 @@ public with sharing class ganttChart {
                                      FROM Holiday__c
                                     ];
                return holidays;
-}
+    }
 
 }
    
