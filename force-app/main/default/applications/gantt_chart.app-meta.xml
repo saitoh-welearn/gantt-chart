@@ -22,5 +22,6 @@
     <tabs>Overview</tabs>
     <tabs>Project__c</tabs>
     <tabs>Resource__c</tabs>
+    <tabs>Holiday__c</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>
