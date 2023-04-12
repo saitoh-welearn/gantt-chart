@@ -157,6 +157,11 @@ export default class GanttChart extends LightningElement {
 
   //休日
   @track holidays =[];
+/*
+  //レコードページのガントチャートで以下のエラーが発生する。
+   [LWC component's @wire target property or method threw an error during value provisioning. 
+   moment is not defined
+   
   @wire(getHolidays)
   wiredGetHolidays({ data, error }) {
       if (data) {
@@ -168,7 +173,7 @@ export default class GanttChart extends LightningElement {
           console.error(error);
       }
   }
-
+*/
  
   setDateHeaders() {
     this.endDate = moment(this.startDate)
@@ -182,6 +187,14 @@ export default class GanttChart extends LightningElement {
     let today = new Date();
     today.setHours(0, 0, 0, 0);
     today = today.getTime();
+
+    getHolidays()
+      .then( data=>{ this.holidays = data.map(holiday => holiday.HolidayDate__c) })
+      .catch(error => this.dispatchEvent(
+                            new ShowToastEvent({
+                            message: error.body.message,
+                            variant: 'error'})) 
+      );
 
     let dates = {};
 
