@@ -655,4 +655,22 @@ export default class GanttChartResource extends NavigationMixin(LightningElement
         );
       });
   }
+
+  navigateToRecordpage(event) {
+
+    let recid = event.target.dataset.recordId;
+    console.log(event.target.dataset.recordId);
+
+    this[NavigationMixin.GenerateUrl]({
+      type: 'standard__recordPage',
+      attributes: {
+            objectApiName: 'Resource__c',
+            recordId: recid,
+            actionName: 'view',
+      },
+    }).then(url => {
+      window.open(url, "_blank");
+    });
+  }
+
 }
