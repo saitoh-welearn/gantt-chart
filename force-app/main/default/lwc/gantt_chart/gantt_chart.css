@@ -46,6 +46,11 @@
     margin-top: 3px;
 }
 
+.lwc-timeline_day.lwc-is-holiday {
+    background: rgba(221, 63, 14, 0.1);
+    border-top: 3px solid #dd2929;
+    margin-top: 3px;
+}
 .lwc-timeline_month {
     border-radius: .25rem;
 }

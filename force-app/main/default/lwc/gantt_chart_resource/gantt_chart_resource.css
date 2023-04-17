@@ -136,6 +136,9 @@
     background: rgba(221, 63, 14, 0.1);
 }
 
+.lwc-timeslot.lwc-is-holiday{
+    background: rgba(221, 63, 14, 0.1);
+}
 
 .lwc-timeslot:hover {
     background-color: rgb(232, 232, 232);
